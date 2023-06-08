@@ -43,7 +43,7 @@ const config = {
     let tableData = [];
     // option 1 fancy one line table data format
     tableData = [Object.keys(data[0]), ...data.map(val => Object.values(val))];
-  
+    console.log(tableData);
     const answers = await inquirer.prompt([
       {
         message: "\n" + table(tableData, config),
@@ -52,3 +52,45 @@ const config = {
       }
     ]);
   }
+
+  const menu = async function () {
+    const choices = await inquirer.prompt([
+        {
+            message: "What do you want to do?",
+            type: "list",
+            name: "options",
+            choices: [
+                "View all departments",
+                "View all roles",
+                "View all employees",
+                "Add a department",
+                "Add a role",
+                "Add an employee",
+                "Update an employee role",
+                // "Update employee managers",
+                // "View employees by manager",
+                // "Delete departments, roles, and employees",
+                // "View the total utilized budget of a department",
+            ]
+        }
+    ])
+    if(choices.options === "View all departments") {
+        await viewDepartments();
+        await menu();
+    } 
+  };
+
+  const viewDepartments = async function () {
+    // console.log("test");
+
+    const results = await db.query("SELECT * FROM department");
+    console.log(results[0]);
+    const dbData = results[0];
+    showTable(dbData);
+  }
+
+  const init = async function () {
+    await menu();
+  };
+
+  init();
