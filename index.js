@@ -77,13 +77,25 @@ const config = {
     if(choices.options === "View all departments") {
         await viewDepartments();
         await menu();
-    } 
+    } else if(choices.options === "View all roles") {
+        await viewRoles();
+        await menu();
+    }
   };
 
   const viewDepartments = async function () {
     // console.log("test");
 
     const results = await db.query("SELECT * FROM department");
+    console.log(results[0]);
+    const dbData = results[0];
+    showTable(dbData);
+  }
+
+  const viewRoles = async function () {
+    // console.log("test");
+
+    const results = await db.query("SELECT * FROM role");
     console.log(results[0]);
     const dbData = results[0];
     showTable(dbData);
