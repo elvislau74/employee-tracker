@@ -23,6 +23,7 @@
     "emoji-regex": "^8.0.0",
     "escape-string-regexp": "^5.0.0",
     "external-editor": "^3.1.0",
+    "figlet": "^1.6.0",
     "figures": "^5.0.0",
     "generate-function": "^2.3.1",
     "has-flag": "^4.0.0",

@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const {table} = require('table');
 const mysql = require('mysql2/promise');
+const figlet = require('figlet');
 
 let db;
 mysql.createConnection(
@@ -103,8 +104,16 @@ const config = {
     const dbData = results[0];
     showTable(dbData);
   }
-
+  
   const init = async function () {
+    // figlet("Employee Tracker", function (err, data) {
+    //     if (err){
+    //         console.log("Something went wrong...");
+    //         console.dir(err);
+    //         return;
+    //     }
+    //     console.log(data);
+    // });
     await menu();
   };
 
