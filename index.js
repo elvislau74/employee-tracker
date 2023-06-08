@@ -15,7 +15,7 @@ mysql.createConnection(
 .then((connection) => {
     db = connection;
     console.log('Connected to the human_resources_db database.');
-})
+});
 
 const config = {
     border: {
@@ -84,6 +84,9 @@ const config = {
     } else if(choices.options === "View all employees") {
         await viewEmployees();
         await menu();
+    } else if(choices.options === "Add a department") {
+      await addDepartment();
+      await menu();
     }
   };
 
@@ -91,19 +94,35 @@ const config = {
     const results = await db.query("SELECT * FROM department");
     const dbData = results[0];
     showTable(dbData);
-  }
+  };
 
   const viewRoles = async function () {
     const results = await db.query("SELECT * FROM role");
     const dbData = results[0];
     showTable(dbData);
-  }
+  };
 
   const viewEmployees = async function () {
     const results = await db.query("SELECT * FROM employee");
     const dbData = results[0];
     showTable(dbData);
-  }
+  };
+
+  const addDepartment = async function () {
+    const results = await db.query("SELECT * FROM department");
+    const dbData = results[0];
+    const departmentData = await inquirer.prompt([
+      {
+        message: "What department would you like to add?",
+        type: "input",
+        name: "new_department"
+      }
+    ]);
+    console.log(departmentData.new_department);
+    const departmentName = departmentData.new_department;
+    // await showTable(departmentData);
+    // await db.query("INSERT INTO department SET", departmentData);
+  };
   
   const init = async function () {
     // figlet("Employee Tracker", function (err, data) {
