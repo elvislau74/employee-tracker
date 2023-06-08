@@ -15,6 +15,7 @@ mysql.createConnection(
 .then((connection) => {
     db = connection;
     console.log('Connected to the human_resources_db database.');
+    init();
 });
 
 const config = {
@@ -115,25 +116,30 @@ const config = {
       {
         message: "What department would you like to add?",
         type: "input",
-        name: "new_department"
+        name: "name"
       }
     ]);
     console.log(departmentData.new_department);
     const departmentName = departmentData.new_department;
-    // await showTable(departmentData);
-    // await db.query("INSERT INTO department SET", departmentData);
+    await showTable([departmentData]);
+    await db.query("INSERT INTO department SET ?", departmentData);
   };
   
   const init = async function () {
-    // figlet("Employee Tracker", function (err, data) {
-    //     if (err){
-    //         console.log("Something went wrong...");
-    //         console.dir(err);
-    //         return;
-    //     }
-    //     console.log(data);
-    // });
-    await menu();
+    figlet("Employee Tracker", async function (err, data) {
+        if (err){
+            console.log("Something went wrong...");
+            console.dir(err);
+            return;
+        }
+        await inquirer.prompt([
+          {
+            message: "\n" + data + "\nPress Enter to Continue.",
+            type: "input",
+            name: "name"
+          }
+        ]);
+        // console.log(data);
+        await menu();
+    });
   };
-
-  init();
