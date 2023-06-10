@@ -88,6 +88,9 @@ const config = {
     } else if(choices.options === "Add a department") {
       await addDepartment();
       await menu();
+    } else if(choices.options === "Add a role") {
+      await addRole();
+      await menu();
     }
   };
 
@@ -119,12 +122,45 @@ const config = {
         name: "name"
       }
     ]);
-    console.log(departmentData.new_department);
-    const departmentName = departmentData.new_department;
     await showTable([departmentData]);
     await db.query("INSERT INTO department SET ?", departmentData);
+    console.log(`Successfully added the department ${departmentData.name}.`)
   };
   
+  const addRole = async function () {
+    const results = await db.query("SELECT * FROM department");
+    const dbData = results[0];
+   
+    const departmentChosen = await inquirer.prompt([
+      {
+        message: "Which department is this role under?",
+        type: "list",
+        choices: dbData,
+        name: "department"
+      }
+    ]);
+    const roleData = await inquirer.prompt([
+      {
+        message: "What role would you like to add?",
+        type: "input",
+        name: "title"
+      },
+      {
+        message: "What is the salary of this role?",
+        type: "input",
+        name: "salary"
+      },
+    ]);
+    
+    for(let department of dbData){
+      if(departmentChosen.department === department.name){
+        roleData.department_id = department.id;
+      }
+    }
+    await showTable([roleData]);
+    await db.query("INSERT INTO role SET ?", roleData);
+  };
+
   const init = async function () {
     figlet("Employee Tracker", async function (err, data) {
         if (err){
