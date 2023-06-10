@@ -94,6 +94,9 @@ const config = {
     } else if(choices.options === "Add an employee") {
       await addEmployee();
       await menu();
+    } else if(choices.options === "Update an employee role") {
+      await updateRole();
+      await menu();
     }
   };
 
@@ -171,7 +174,6 @@ const config = {
     const dbData2 = employeeResults[0];
     const roleArray = [];
     
-    
     for(let role of dbData){
       roleArray.push(role.title);
     };
@@ -184,6 +186,7 @@ const config = {
         name: "role"
       }
     ]);
+
     const employeeData = await inquirer.prompt([
       {
         message: "What is their first name?",
@@ -227,6 +230,64 @@ const config = {
     await db.query("INSERT INTO employee SET ?", employeeData);
   };
 
+  const updateRole = async function () {
+    const employeeResults = await db.query("SELECT * FROM employee");
+    const roleResults = await db.query("SELECT * FROM role");
+    const dbData = employeeResults[0];
+    const dbData2 = roleResults[0];
+   
+    const choiceData = dbData.map( (row) => ({
+      name: row.first_name + " " + row.last_name,
+      value: row
+    }));
+
+    const employeeToChange = await inquirer.prompt([
+      {
+        message: "Which employee would to like to update the role of?",
+        type: "list",
+        choices: choiceData,
+        name: "name"
+      }
+    ]);
+
+    const choiceData2 = dbData2.map( (row) => ({
+      name: row.title,
+      value: row
+    }));
+
+    const roleToAssign = await inquirer.prompt([
+      {
+        message: "Which role do you want to assign to them?",
+        type: "list",
+        choices: choiceData2,
+        name: "title"
+      }
+    ]);
+    const employeeFirstName = employeeToChange.name.first_name;
+    const employeeLastName = employeeToChange.name.last_name;
+    const employeeManagerID = employeeToChange.name.manager_id;
+    const employeeID = employeeToChange.name.id;
+    const roleAssigned = roleToAssign.title.id;
+
+    const displayToTable = {
+      first_name: employeeFirstName,
+      last_name: employeeLastName,
+      role_id: roleAssigned,
+      manager_id: employeeManagerID
+    }
+
+    await inquirer.prompt([
+      {
+        message: `${employeeFirstName} ${employeeLastName} successully assigned to ${roleToAssign.title.title}.\nPress Enter to continue.`,
+        type: "input",
+        name: "enter"
+      }
+    ]);
+    await showTable([displayToTable]);
+    // await db.query("UPDATE employee SET ", displayToTable);
+    // await db.query("UPDATE employee SET role_id = ? WHERE id = ?", roleAssigned, employeeID);
+  };
+
   const init = async function () {
     figlet("Employee Tracker", async function (err, data) {
         if (err){
@@ -241,7 +302,6 @@ const config = {
             name: "name"
           }
         ]);
-        // console.log(data);
         await menu();
     });
   };
