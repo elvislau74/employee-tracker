@@ -91,6 +91,9 @@ const config = {
     } else if(choices.options === "Add a role") {
       await addRole();
       await menu();
+    } else if(choices.options === "Add an employee") {
+      await addEmployee();
+      await menu();
     }
   };
 
@@ -159,6 +162,69 @@ const config = {
     }
     await showTable([roleData]);
     await db.query("INSERT INTO role SET ?", roleData);
+  };
+
+  const addEmployee = async function () {
+    const roleResults = await db.query("SELECT * FROM role");
+    const employeeResults = await db.query("SELECT * FROM employee")
+    const dbData = roleResults[0];
+    const dbData2 = employeeResults[0];
+    const roleArray = [];
+    
+    
+    for(let role of dbData){
+      roleArray.push(role.title);
+    };
+    
+    const roleAssigned = await inquirer.prompt([
+      {
+        message: "What role will this new employee be assigned to?",
+        type: "list",
+        choices: roleArray,
+        name: "role"
+      }
+    ]);
+    const employeeData = await inquirer.prompt([
+      {
+        message: "What is their first name?",
+        type: "input",
+        name: "first_name"
+      },
+      {
+        message: "What is their last name?",
+        type: "input",
+        name: "last_name"
+      },
+    ]);
+
+    const choiceData = dbData2.map( (row) => ({
+      name: row.first_name + " " + row.last_name,
+      value: row
+    }))
+
+    choiceData.push({
+      name: "No manager",
+      value: {id: null}
+    });
+
+    const managerAssigned = await inquirer.prompt([
+      {
+        message: "Who will be assigned as their manager?",
+        type: "list",
+        choices: choiceData,
+        name: "manager"
+      }
+    ])
+    
+    for(let role of dbData) {
+      if(roleAssigned.role === role.title){
+        employeeData.role_id = role.id;
+      }
+    }
+
+    employeeData.manager_id = managerAssigned.manager.id;
+    await showTable([employeeData]);
+    await db.query("INSERT INTO employee SET ?", employeeData);
   };
 
   const init = async function () {
