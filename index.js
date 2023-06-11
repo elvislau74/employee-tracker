@@ -69,7 +69,7 @@ const config = {
                 "Add a role",
                 "Add an employee",
                 "Update an employee role",
-                // "Update employee managers",
+                "Update employee managers",
                 // "View employees by manager",
                 // "Delete departments, roles, and employees",
                 // "View the total utilized budget of a department",
@@ -96,6 +96,9 @@ const config = {
       await menu();
     } else if(choices.options === "Update an employee role") {
       await updateRole();
+      await menu();
+    } else if(choices.options === "Update employee managers") {
+      await updateManager();
       await menu();
     }
   };
@@ -308,6 +311,70 @@ const config = {
     ]);
     await showTable([displayToTable]);
     await db.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleAssigned, employeeID]);
+  };
+
+  const updateManager = async function () {
+    const employeeResults = await db.query("SELECT * FROM employee");
+    const dbData = employeeResults[0];
+   
+    const choiceData = dbData.map( (row) => ({
+      name: row.first_name + " " + row.last_name,
+      value: row
+    }));
+
+    const employeeToChange = await inquirer.prompt([
+      {
+        message: "Which employee would to like to update the manager of?",
+        type: "list",
+        choices: choiceData,
+        name: "name"
+      }
+    ]);
+
+    const choiceData2 = dbData.map( (row) => ({
+      name: row.first_name + " " + row.last_name,
+      value: row
+    }));
+    
+    choiceData2.push({
+      name: "No manager",
+      value: {id: null}
+    });
+    
+    const managersList = choiceData2.filter((employee) => {
+      return employee.value.first_name !== employeeToChange.name.first_name;
+    });
+  
+    const managerToAssign = await inquirer.prompt([
+      {
+        message: "Who will be assigned as their new manager?",
+        type: "list",
+        choices: managersList,
+        name: "name"
+      }
+    ]);
+    const employeeFirstName = employeeToChange.name.first_name;
+    const employeeLastName = employeeToChange.name.last_name;
+    const employeeID = employeeToChange.name.id;
+    const newManagerID = managerToAssign.name.id;
+    const roleID = employeeToChange.name.role_id;
+
+    const displayToTable = {
+      first_name: employeeFirstName,
+      last_name: employeeLastName,
+      role_id: roleID,
+      manager_id: newManagerID
+    }
+
+    await inquirer.prompt([
+      {
+        message: `${employeeFirstName} ${employeeLastName} successully assigned to a new manager.\nPress Enter to continue.`,
+        type: "input",
+        name: "enter"
+      }
+    ]);
+    await showTable([displayToTable]);
+    await db.query("UPDATE employee SET manager_id = ? WHERE id = ?", [newManagerID, employeeID]);
   };
 
   const init = async function () {
