@@ -72,7 +72,7 @@ const config = {
                 "Update employee managers",
                 // "View employees by manager",
                 // "Delete departments, roles, and employees",
-                // "View the total utilized budget of a department",
+                "View the total utilized budget of a department",
             ]
         }
     ])
@@ -100,7 +100,17 @@ const config = {
     } else if(choices.options === "Update employee managers") {
       await updateManager();
       await menu();
+    } else if(choices.options === "View the total utilized budget of a department") {
+      await viewDepBudget();
+      await menu();
     }
+  };
+
+  const viewDepBudget = async function () {
+    // const departBudget = await db.query("SELECT SUM(salary) AS utilized_budget, department.name as department FROM role JOIN department ON department.id = role.department_id GROUP BY department_id");
+    const departBudget = await db.query("SELECT department.name as department, SUM(salary) AS utilized_budget FROM department JOIN role ON department.id = role.department_id GROUP BY department.id");
+    const dbData = departBudget[0];
+    showTable(dbData);
   };
 
   const viewDepartments = async function () {
