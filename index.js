@@ -71,7 +71,7 @@ const config = {
                 "Update an employee role",
                 "Update employee managers",
                 "View employees by manager",
-                // "Delete departments, roles, and employees",
+                "Delete departments, roles, and employees",
                 "View the total utilized budget of a department",
             ]
         }
@@ -103,11 +103,55 @@ const config = {
     } else if(choices.options === "View employees by manager") {
       await viewByManager();
       await menu();
-    } else if(choices.options === "View the total utilized budget of a department") {
+    } else if(choices.options === "Delete departments, roles, and employees") {
+      await deleteFromDb();
+      await menu();
+    } else {
       await viewDepBudget();
       await menu();
     }
   };
+
+  const deleteFromDb = async function () {
+    const dbChosen = await inquirer.prompt([
+      {
+          message: "Which database do you want to delete from?",
+          type: "list",
+          name: "options",
+          choices: [
+              "Departments",
+              "Roles",
+              "Employees",
+          ]
+      }
+    ])
+    if(dbChosen.options === "Departments"){
+      const results = await db.query("SELECT * FROM department");
+      const dbData = results[0];
+      const choiceData = dbData.map( (row) => ({
+        name: row.name,
+        value: row
+      }))
+      const departmentToDelete = await inquirer.prompt([
+        {
+          message: "Which department do you want to delete?",
+          type: "list",
+          name: "name",
+          choices: choiceData
+        }
+      ]);
+      const departmentId = departmentToDelete.name.id;
+      // console.log(departmentId);
+      await db.query("DELETE FROM department WHERE id = ?", departmentId);
+    } else if(dbChosen.options === "Roles") {
+      const results = await db.query("SELECT * FROM role");
+      const dbData = results[0];
+
+    } else {
+      const results = await db.query("SELECT * FROM employee");
+      const dbData = results[0];
+    }
+  }
 
   // const viewByManager = async function () {
   //   const departBudget = await db.query("SELECT employee.first_name AS manager_name, employee.first_name AS employee_name FROM employee JOIN employee ON employee.manager_id = employee.id GROUP BY manager_id");
