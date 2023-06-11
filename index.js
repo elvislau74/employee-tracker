@@ -119,8 +119,6 @@ const config = {
   };
 
   const addDepartment = async function () {
-    const results = await db.query("SELECT * FROM department");
-    const dbData = results[0];
     const departmentData = await inquirer.prompt([
       {
         message: "What department would you like to add?",
@@ -128,9 +126,15 @@ const config = {
         name: "name"
       }
     ]);
+    await inquirer.prompt([
+      {
+        message: `Successfully added the department ${departmentData.name} into database.\nPress Enter to continue.`,
+        type: "input",
+        name: "enter"
+      }
+    ]);
     await showTable([departmentData]);
     await db.query("INSERT INTO department SET ?", departmentData);
-    console.log(`Successfully added the department ${departmentData.name}.`)
   };
   
   const addRole = async function () {
@@ -163,6 +167,13 @@ const config = {
         roleData.department_id = department.id;
       }
     }
+    await inquirer.prompt([
+      {
+        message: `${roleData.title} successully entered into database as a role.\nPress Enter to continue.`,
+        type: "input",
+        name: "enter"
+      }
+    ]);
     await showTable([roleData]);
     await db.query("INSERT INTO role SET ?", roleData);
   };
@@ -218,14 +229,26 @@ const config = {
         name: "manager"
       }
     ])
-    
+
     for(let role of dbData) {
       if(roleAssigned.role === role.title){
         employeeData.role_id = role.id;
+
       }
     }
-
+    console.log(firstName, lastName);
     employeeData.manager_id = managerAssigned.manager.id;
+
+    const firstName = employeeData.first_name;
+    const lastName = employeeData.last_name;
+
+    await inquirer.prompt([
+      {
+        message: `${firstName} ${lastName} successully entered into database as an employee.\nPress Enter to continue.`,
+        type: "input",
+        name: "enter"
+      }
+    ]);
     await showTable([employeeData]);
     await db.query("INSERT INTO employee SET ?", employeeData);
   };
@@ -284,8 +307,7 @@ const config = {
       }
     ]);
     await showTable([displayToTable]);
-    // await db.query("UPDATE employee SET ", displayToTable);
-    // await db.query("UPDATE employee SET role_id = ? WHERE id = ?", roleAssigned, employeeID);
+    await db.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleAssigned, employeeID]);
   };
 
   const init = async function () {
