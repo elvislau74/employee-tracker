@@ -1,9 +1,12 @@
+// Call all dependencies
 const inquirer = require('inquirer');
 const {table} = require('table');
+// promise version of mysql
 const mysql = require('mysql2/promise');
 const figlet = require('figlet');
 
 let db;
+// Connect with MySQL database
 mysql.createConnection(
     {
         host: 'localhost',
@@ -18,6 +21,7 @@ mysql.createConnection(
     init();
 });
 
+// Create body of table
 const config = {
     border: {
       topBody: `─`,
@@ -41,9 +45,10 @@ const config = {
     }
   };
 
+  // This function takes in data, converts it into an array of objects 
+  // and prints it out into a table. 
   async function showTable (data){
     let tableData = [];
-    // option 1 fancy one line table data format
     tableData = [Object.keys(data[0]), ...data.map(val => Object.values(val))];
     console.log(tableData);
     const answers = await inquirer.prompt([
@@ -55,6 +60,8 @@ const config = {
     ]);
   }
 
+  // Displays a menu for user to choose what to do
+  // If/else statements to add functions to all choices
   const menu = async function () {
     const choices = await inquirer.prompt([
         {
@@ -77,14 +84,14 @@ const config = {
         }
     ])
     if(choices.options === "View all departments") {
-        await viewDepartments();
-        await menu();
+      await viewDepartments();
+      await menu();
     } else if(choices.options === "View all roles") {
-        await viewRoles();
-        await menu();
+      await viewRoles();
+      await menu();
     } else if(choices.options === "View all employees") {
-        await viewEmployees();
-        await menu();
+      await viewEmployees();
+      await menu();
     } else if(choices.options === "Add a department") {
       await addDepartment();
       await menu();
@@ -114,6 +121,7 @@ const config = {
     }
   };
 
+  // Function to delete from each table in database based on user input with if/else statements
   const deleteFromDb = async function () {
     const dbChosen = await inquirer.prompt([
       {
@@ -209,30 +217,35 @@ const config = {
   //   showTable(dbData);
   // };
 
+  // Function to view the full budget/total salaries of each department
   const viewDepBudget = async function () {
     const departBudget = await db.query("SELECT department.name as department, SUM(salary) AS utilized_budget FROM department JOIN role ON department.id = role.department_id GROUP BY department.id");
     const dbData = departBudget[0];
     showTable(dbData);
   };
 
+  // Function to view data currently in the department table
   const viewDepartments = async function () {
     const results = await db.query("SELECT * FROM department");
     const dbData = results[0];
     showTable(dbData);
   };
 
+  // Function to view data currently in the role table
   const viewRoles = async function () {
     const results = await db.query("SELECT * FROM role");
     const dbData = results[0];
     showTable(dbData);
   };
 
+  // Function to view data currently in the employee table
   const viewEmployees = async function () {
     const results = await db.query("SELECT * FROM employee");
     const dbData = results[0];
     showTable(dbData);
   };
 
+  // Function to add a department based on user input with inquirer
   const addDepartment = async function () {
     const departmentData = await inquirer.prompt([
       {
@@ -252,6 +265,7 @@ const config = {
     await db.query("INSERT INTO department SET ?", departmentData);
   };
   
+  // Function to add a role based on user input with inquirer
   const addRole = async function () {
     const results = await db.query("SELECT * FROM department");
     const dbData = results[0];
@@ -293,6 +307,7 @@ const config = {
     await db.query("INSERT INTO role SET ?", roleData);
   };
 
+  // Function to add an employee based on user input with inquirer
   const addEmployee = async function () {
     const roleResults = await db.query("SELECT * FROM role");
     const employeeResults = await db.query("SELECT * FROM employee")
@@ -368,6 +383,8 @@ const config = {
     await db.query("INSERT INTO employee SET ?", employeeData);
   };
 
+  // Function to update the role of current employees in the database 
+  // with user input from inquirer
   const updateRole = async function () {
     const employeeResults = await db.query("SELECT * FROM employee");
     const roleResults = await db.query("SELECT * FROM role");
@@ -425,6 +442,8 @@ const config = {
     await db.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleAssigned, employeeID]);
   };
 
+  // Function to update the manager of current employees in the database 
+  // with user input from inquirer
   const updateManager = async function () {
     const employeeResults = await db.query("SELECT * FROM employee");
     const dbData = employeeResults[0];
@@ -489,6 +508,8 @@ const config = {
     await db.query("UPDATE employee SET manager_id = ? WHERE id = ?", [newManagerID, employeeID]);
   };
 
+  // Function to initialize the application by calling the menu function
+  // Also prints out ASCII art with Title of app using figlet package
   const init = async function () {
     figlet("Employee Tracker", async function (err, data) {
         if (err){
