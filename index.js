@@ -141,11 +141,24 @@ const config = {
         }
       ]);
       const departmentId = departmentToDelete.name.id;
-      // console.log(departmentId);
       await db.query("DELETE FROM department WHERE id = ?", departmentId);
     } else if(dbChosen.options === "Roles") {
       const results = await db.query("SELECT * FROM role");
       const dbData = results[0];
+      const choiceData = dbData.map( (row) => ({
+        name: row.title,
+        value: row
+      }))
+      const roleToDelete = await inquirer.prompt([
+        {
+          message: "Which role do you want to delete?",
+          type: "list",
+          name: "title",
+          choices: choiceData
+        }
+      ]);
+      const roleId = roleToDelete.title.id;
+      await db.query("DELETE FROM role WHERE id = ?", roleId);
 
     } else {
       const results = await db.query("SELECT * FROM employee");
