@@ -142,6 +142,13 @@ const config = {
       ]);
       const departmentId = departmentToDelete.name.id;
       await db.query("DELETE FROM department WHERE id = ?", departmentId);
+      await inquirer.prompt([
+        {
+          message: `${departmentToDelete.name.name} successfully deleted from the database.\nPress enter to continue.`,
+          type: "input",
+          name: "enter"
+        }
+      ])
     } else if(dbChosen.options === "Roles") {
       const results = await db.query("SELECT * FROM role");
       const dbData = results[0];
@@ -159,10 +166,38 @@ const config = {
       ]);
       const roleId = roleToDelete.title.id;
       await db.query("DELETE FROM role WHERE id = ?", roleId);
+      await inquirer.prompt([
+        {
+          message: `${roleToDelete.title.title} successfully deleted from the database.\nPress enter to continue.`,
+          type: "input",
+          name: "enter"
+        }
+      ])
 
     } else {
       const results = await db.query("SELECT * FROM employee");
       const dbData = results[0];
+      const choiceData = dbData.map( (row) => ({
+        name: row.first_name + " " + row.last_name,
+        value: row
+      }))
+      const employeeToDelete = await inquirer.prompt([
+        {
+          message: "Which employee do you want to delete?",
+          type: "list",
+          name: "name",
+          choices: choiceData
+        }
+      ]);
+      const employeeId = employeeToDelete.name.id;
+      await db.query("DELETE FROM employee WHERE id = ?", employeeId);
+      await inquirer.prompt([
+        {
+          message: `${employeeToDelete.name.first_name} ${employeeToDelete.name.last_name} successfully deleted from the database.\nPress enter to continue.`,
+          type: "input",
+          name: "enter"
+        }
+      ])
     }
   }
 
