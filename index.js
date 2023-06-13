@@ -50,7 +50,6 @@ const config = {
 async function showTable(data) {
   let tableData = [];
   tableData = [Object.keys(data[0]), ...data.map(val => Object.values(val))];
-  console.log(tableData);
   const answers = await inquirer.prompt([
     {
       message: "\n" + table(tableData, config),
@@ -218,7 +217,6 @@ const viewByManager = async function () {
   JOIN employee AS m ON e.manager_id = m.id 
   ORDER BY e.manager_id`);
   const dbData = employeeByManager[0];
-  console.log(employeeByManager);
   showTable(dbData);
 };
 
