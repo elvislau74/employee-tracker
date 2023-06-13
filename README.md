@@ -62,7 +62,7 @@ https://github.com/elvislau74/employee-tracker/assets/126195092/4de5f457-7737-4a
 
   ## Credits
 
-  I would like to thank my Instructor, Anthony Mattadu, for providing some hints and helping me a lot when I was lost in this challenge.
+  I would like to give a big thanks to my Instructor, [Anthony Mattadu](https://github.com/amaddatu), for providing some hints and helping me a lot when I was lost in this challenge.
 
 
   ## License
