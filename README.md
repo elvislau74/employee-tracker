@@ -43,6 +43,10 @@
   As shown in the video below, after typing `node.index` into the terminal, the application will start and prompt the user with a menu of different options. Go through these different options to view, add, edit and delete data from the employee tracker database.
 
   
+
+https://github.com/elvislau74/employee-tracker/assets/126195092/4de5f457-7737-4a6e-a0a5-ebec904fdc02
+
+
   If the video above does not work, click [here](https://drive.google.com/file/d/15B75e-jn1EvtnDHhLzOTLQdma8YCUmU8/view).
 
 
